@@ -43,6 +43,14 @@
   width: 100px;
 }
 
+.total-waves {
+  text-align: center;
+}
+
+.connect-btn:disabled {
+  cursor: not-allowed;
+}
+
 /* on smaller screens */
 @media (max-width: 600px) {
   .main-container {
