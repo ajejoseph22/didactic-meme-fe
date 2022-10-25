@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import ConnectButton from "./components/connect-btn";
 import { toast } from "react-toastify";
+import {ethers} from "ethers";
+import abi from "../utils/abi.json";
 
 import "./App.css";
 
 const getEthereumObject = () => window.ethereum;
+
+const CONTRACT_ADDRESS = "0xb2d6bBd3fC1fe4E9f945144DAD980de693757984";
+const CONTRACT_ABI = abi.abi;
 
 /*
  * This function returns the first linked account found.
@@ -75,7 +80,36 @@ export default function App() {
     }
   }, []);
 
-  const wave = () => {};
+  const wave = async () => {
+    try {
+      const {ethereum} = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+        let count = await wavePortalContract.getTotalWaves();
+        console.log("Retrieved total wave count...", count.toNumber());
+
+        /*
+        * Execute the actual wave from your smart contract
+        */
+        const waveTxn = await wavePortalContract.wave();
+        console.log("Mining...", waveTxn.hash);
+
+        await waveTxn.wait();
+        console.log("Mined -- ", waveTxn.hash);
+
+        count = await wavePortalContract.getTotalWaves();
+        console.log("Retrieved total wave count...", count.toNumber());
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="main-container">
