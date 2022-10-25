@@ -1,7 +1,7 @@
 const ConnectButton = ({ connected, connectFn }) => {
   if (connected) {
     return (
-      <button className="btn btn-primary" disabled>
+      <button className="btn btn-primary connect-btn" disabled>
         Connected
       </button>
     );
