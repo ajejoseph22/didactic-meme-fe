@@ -157,8 +157,8 @@ export default function App() {
         <button className="wave-btn" disabled={loading} onClick={wave}>
           Wave at Me
         </button>
-        {!loading && <p className="total-waves">Total number of waves: {totalWaves}</p>}
-        {loading && <p className="total-waves">Loading...</p>}
+        {currentAccount && !loading && <p className="total-waves">Total number of waves: {totalWaves}</p>}
+        {currentAccount && loading && <p className="total-waves">Loading...</p>}
       </div>
     </div>
   );
