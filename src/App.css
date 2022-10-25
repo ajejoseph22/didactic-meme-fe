@@ -47,7 +47,7 @@
   text-align: center;
 }
 
-.connect-btn:disabled {
+.connect-btn:disabled, .wave-btn:disabled {
   cursor: not-allowed;
 }
 
