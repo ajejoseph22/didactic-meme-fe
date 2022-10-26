@@ -177,7 +177,7 @@ export default function App() {
       <div className="data-container">
         <ConnectButton connected={!!currentAccount} connectFn={connectWallet} />
 
-        <div className="header">👋 Hey there!</div>
+        <div className="header">👋🏾 Hey there!</div>
 
         <div className="bio">
           I'm Joseph and I build software for a living. That's pretty cool,
