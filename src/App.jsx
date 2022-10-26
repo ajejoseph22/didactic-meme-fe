@@ -184,17 +184,20 @@ export default function App() {
           right? Connect your Ethereum wallet and wave at me!
         </div>
 
-        <button className="wave-btn" disabled={loading} onClick={wave}>
-          Wave at Me
-        </button>
         {currentAccount && (
           <textarea
+            placeholder="Enter your message"
             disabled={loading}
             className="message"
             onChange={(e) => setMessage(e.target.value)}
             value={message}
           />
         )}
+
+        <button className="wave-btn" disabled={loading} onClick={wave}>
+          Wave at Me
+        </button>
+
         {currentAccount && !loading && (
           <p className="total-waves">Total number of waves: {totalWaves}</p>
         )}
