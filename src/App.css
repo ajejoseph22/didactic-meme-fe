@@ -47,7 +47,25 @@
   text-align: center;
 }
 
-.connect-btn:disabled, .wave-btn:disabled {
+.message {
+  border: none;
+  margin: 20px;
+  border-radius: 5px;
+}
+
+.msg-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px
+}
+
+.message:focus {
+  outline: none;
+}
+
+.connect-btn:disabled,
+.wave-btn:disabled,
+.message:disabled {
   cursor: not-allowed;
 }
 
@@ -58,7 +76,7 @@
     margin: 20% auto;
   }
 
-  .header {
+  .header, .message {
     text-align: center;
     font-size: 2rem;
     font-weight: 600;

@@ -8,13 +8,15 @@ import "./App.css";
 
 const getEthereumObject = () => window.ethereum;
 
-const CONTRACT_ADDRESS = "0xb2d6bBd3fC1fe4E9f945144DAD980de693757984";
+const CONTRACT_ADDRESS = "0x5ad492a30e32058e3E76E9BC3A85c7354aCE079F";
 const CONTRACT_ABI = abi.abi;
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [wavePortalContract, setWavePortalContract] = useState({});
   const [totalWaves, setTotalWaves] = useState(0);
+  const [allWaves, setAllWaves] = useState([]);
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
   const isFirstRender = React.useRef(true);
@@ -41,11 +43,13 @@ export default function App() {
       const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
       // Set WavePortalContract to state
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      console.log("Contract: ", contract);
-      setWavePortalContract(
-        contract
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        signer,
       );
+      console.log("Contract: ", contract);
+      setWavePortalContract(contract);
 
       if (accounts.length !== 0) {
         const account = accounts[0];
@@ -81,6 +85,7 @@ export default function App() {
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
       await getTotalWaves();
+      await getAllWaves();
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -96,6 +101,27 @@ export default function App() {
     return count.toNumber();
   };
 
+  const getAllWaves = async () => {
+    try {
+      const waves = await wavePortalContract.getAllWaves();
+      console.log("Retrieved all waves...", waves);
+
+      let wavesCleaned = [];
+      waves.forEach((wave) => {
+        wavesCleaned.push({
+          address: wave.waver,
+          timestamp: new Date(wave.timestamp * 1000),
+          message: wave.message,
+        });
+      });
+
+      setAllWaves(wavesCleaned);
+      return wavesCleaned;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(async () => {
     const account = await findMetaMaskAccount();
 
@@ -107,12 +133,13 @@ export default function App() {
   useEffect(async () => {
     // skip first render
     if (isFirstRender.current) {
-        isFirstRender.current = false;
-        return;
+      isFirstRender.current = false;
+      return;
     }
 
     setTotalWaves(await getTotalWaves());
-    setLoading(false)
+    setAllWaves(await getAllWaves());
+    setLoading(false);
   }, [wavePortalContract]);
 
   const wave = async () => {
@@ -120,21 +147,22 @@ export default function App() {
       const { ethereum } = window;
 
       if (ethereum) {
-        await getTotalWaves()
-
         /*
          * Execute the actual wave from your smart contract
          */
-        const waveTxn = await wavePortalContract.wave();
-        setLoading(true)
+        console.log("MESSAGE", message);
+        const waveTxn = await wavePortalContract.wave(message);
+        setLoading(true);
         console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
         console.log("Mined -- ", waveTxn.hash);
-        toast.success("Success", );
+        toast.success("Success");
 
-        await getTotalWaves()
-        setLoading(false)
+        await getTotalWaves();
+        await getAllWaves();
+        setMessage("");
+        setLoading(false);
       } else {
         console.error("Ethereum object doesn't exist!");
       }
@@ -159,8 +187,40 @@ export default function App() {
         <button className="wave-btn" disabled={loading} onClick={wave}>
           Wave at Me
         </button>
-        {currentAccount && !loading && <p className="total-waves">Total number of waves: {totalWaves}</p>}
+        {currentAccount && (
+          <textarea
+            disabled={loading}
+            className="message"
+            onChange={(e) => setMessage(e.target.value)}
+            value={message}
+          />
+        )}
+        {currentAccount && !loading && (
+          <p className="total-waves">Total number of waves: {totalWaves}</p>
+        )}
         {currentAccount && loading && <p className="total-waves">Loading...</p>}
+
+        {currentAccount && (
+          <div className="msg-container">
+            {allWaves
+              .map((wave, index) => {
+                return (
+                  <div
+                    key={index}
+                    style={{
+                      backgroundColor: "OldLace",
+                      padding: "8px",
+                    }}
+                  >
+                    <div>Address: {wave.address}</div>
+                    <div>Time: {wave.timestamp.toString()}</div>
+                    <div>Message: {wave.message}</div>
+                  </div>
+                );
+              })
+              .reverse()}
+          </div>
+        )}
       </div>
     </div>
   );

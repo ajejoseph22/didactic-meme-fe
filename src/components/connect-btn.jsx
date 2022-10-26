@@ -7,7 +7,11 @@ const ConnectButton = ({ connected, connectFn }) => {
     );
   }
 
-  return <button className="connect-btn" onClick={connectFn}>Connect</button>;
+  return (
+    <button className="connect-btn" onClick={connectFn}>
+      Connect
+    </button>
+  );
 };
 
 export default ConnectButton;
